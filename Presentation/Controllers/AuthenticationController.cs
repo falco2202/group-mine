@@ -16,9 +16,13 @@ namespace Presentation.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(RegisterRequest request)
+        public AuthenticationResult Register(RegisterRequest request)
         {
-            return Ok();
+            return _authenticationService.Register(request.FirstName,
+                    request.LastName,
+                    request.Email,
+                    request.Password
+                );
         }
 
         [HttpPost("login")]

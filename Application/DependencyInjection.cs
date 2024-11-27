@@ -12,6 +12,7 @@ namespace Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+            services.AddSingleton<IAuthenticationService, AuthenticationService>();
             return services;
         }
     }

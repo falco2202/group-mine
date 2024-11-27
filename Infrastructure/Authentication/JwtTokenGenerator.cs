@@ -1,4 +1,6 @@
 ﻿using Application.Common.Interfaces.Authentication;
+using Application.Common.Interfaces.Services;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -12,13 +14,21 @@ namespace Infrastructure.Authentication
 {
     public class JwtTokenGenerator : IJwtTokenGenerator
     {
+        private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly JwtSetting _jwtSetting;
+
+        public JwtTokenGenerator(IDateTimeProvider dateTimeProvider, IOptions<JwtSetting> options)
+        {
+            _dateTimeProvider = dateTimeProvider;
+            _jwtSetting = options.Value;
+        }
+
         public string GenerateToken(Guid userId, string firstName, string lastName)
         {
             var signingCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes("secret-key")),
-                SecurityAlgorithms.HmacSha256
-                );
-
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSetting.Secret)),
+                    SecurityAlgorithms.HmacSha256
+                    );
 
             var claims = new[]
             {
@@ -29,13 +39,13 @@ namespace Infrastructure.Authentication
             };
 
             var securityToken = new JwtSecurityToken(
-                issuer: "Falco",
-                expires: DateTime.Now.AddDays(1),
-                claims: claims,
-                signingCredentials: signingCredentials
+                    issuer: _jwtSetting.Issuer,
+                    expires: _dateTimeProvider.UtcNow.AddMinutes(_jwtSetting.ExpityMinutes),
+                    claims: claims,
+                    signingCredentials: signingCredentials
                 );
 
-            return new JwtSecurityTokenHandler().WriteToken( securityToken );
+            return new JwtSecurityTokenHandler().WriteToken(securityToken);
         }
     }
 }
