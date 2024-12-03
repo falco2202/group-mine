@@ -1,5 +1,6 @@
 using Application;
 using Infrastructure;
+using Presentation.Middlewares;
 using System.Threading.RateLimiting;
 
 namespace Presentation
@@ -45,6 +46,8 @@ namespace Presentation
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseMiddleware<ErrorHandlingMiddleware>();
 
             app.UseHttpsRedirection();
 
