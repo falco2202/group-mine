@@ -10,11 +10,16 @@ namespace Infrastructure
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services,
-           ConfigurationManager configurationManager)
+           IConfiguration configuration)
         {
-            services.Configure<JwtSetting>(configurationManager.GetSection("JwtSetting"));
+            services.Configure<JwtSetting>(configuration.GetSection(JwtSetting.SectionName));
             services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddSingleton<IDateTimeProvider, DatetimeProvider>();
+
+            // Add DbContext configuration
+            //services.AddDbContext<GroupMineDbContext>(options =>
+            //        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
             return services;
         }
     }
